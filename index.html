@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OR'S HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--white:#fff;--off:#e8e8e8;--mid:#555;--dim:#2a2a2a;--green:#4ade80;}
+body{background:var(--bg);color:var(--white);font-family:'DM Mono',monospace;min-height:100vh;padding-bottom:80px;}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,10,10,.95);backdrop-filter:blur(10px);z-index:50;}
+.nav-logo{font-family:'Unbounded',sans-serif;font-weight:900;font-size:15px;display:flex;align-items:center;gap:9px;}
+.logo-eye svg{width:24px;height:24px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-pill{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 13px;font-size:11px;color:var(--mid);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.nav-settings-btn{width:34px;height:34px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--mid);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;}
+.nav-settings-btn:hover{border-color:var(--white);color:var(--white);}
+
+/* PAGE */
+.page{max-width:480px;margin:0 auto;padding:24px 16px;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-bottom:12px;opacity:0;animation:up .4s ease forwards;}
+@keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;opacity:0;animation:up .4s ease forwards;}
+.stat-card:nth-child(2){animation-delay:.05s;}
+.slbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+.sval{font-family:'Unbounded',sans-serif;font-weight:900;font-size:44px;line-height:1;}
+.ssub{font-size:11px;color:var(--mid);margin-top:4px;}
+
+/* ACCOUNT */
+.acct-status{font-family:'Unbounded',sans-serif;font-weight:700;font-size:17px;color:var(--green);margin-bottom:10px;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:999px;font-size:11px;border:1px solid var(--border);color:var(--mid);}
+
+/* UPLOAD CARD */
+.upload-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;margin-bottom:16px;}
+.drop-zone{border:1.5px dashed var(--border);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;position:relative;}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--white);background:rgba(255,255,255,.03);}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:28px;margin-bottom:8px;}
+.drop-text{font-size:13px;color:var(--mid);}
+.drop-text strong{color:var(--white);}
+.drop-hint{font-size:11px;color:var(--dim);margin-top:4px;}
+
+.field{margin-bottom:12px;}
+.field-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mid);margin-bottom:7px;}
+.field-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:13px 15px;font-family:'DM Mono',monospace;font-size:13px;color:var(--white);outline:none;transition:border-color .2s;}
+.field-input:focus{border-color:var(--white);}
+.field-input::placeholder{color:var(--mid);}
+.field-textarea{resize:vertical;min-height:100px;font-size:12px;line-height:1.6;}
+
+.divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--mid);font-size:11px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.upload-btn{width:100%;height:46px;border-radius:12px;border:none;background:var(--white);color:var(--bg);font-family:'Unbounded',sans-serif;font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.upload-btn:hover{background:var(--off);}
+.upload-btn:disabled{background:var(--dim);color:#555;cursor:not-allowed;}
+
+/* SCRIPT LIST */
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.list-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;}
+.list-count{font-size:11px;color:var(--mid);}
+.script-item{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;transition:border-color .2s;}
+.script-item:hover{border-color:#333;}
+.si-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.si-left{display:flex;align-items:center;gap:12px;}
+.si-icon{width:40px;height:40px;background:var(--dim);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mid);flex-shrink:0;}
+.si-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px;}
+.si-date{font-size:11px;color:var(--mid);}
+.si-badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.si-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:10px;border:1px solid;}
+.si-badge-prot{border-color:var(--white);color:var(--white);}
+.si-badge-hits{border-color:var(--border);color:var(--mid);}
+.si-badge-off{border-color:var(--border);color:var(--mid);}
+.ls-mini{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:11px;color:var(--mid);word-break:break-all;line-height:1.6;margin-bottom:10px;}
+.ls-mini.dead{text-decoration:line-through;color:var(--dim);}
+.si-btns{display:flex;gap:8px;}
+.si-btn{flex:1;height:38px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--mid);font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.si-btn:hover{border-color:var(--white);color:var(--white);}
+.si-btn.primary{background:var(--white);border-color:var(--white);color:var(--bg);}
+.si-btn.primary:hover{background:var(--off);}
+.si-btn.danger:hover{border-color:#ff5555;color:#ff5555;}
+.empty-list{text-align:center;padding:32px 0;font-size:13px;color:var(--mid);}
+
+/* MENU WRAP */
+.menu-wrap{position:relative;}
+.three-dot{width:32px;height:32px;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--mid);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .2s;flex-shrink:0;line-height:1;}
+.three-dot:hover{border-color:var(--white);color:var(--white);}
+.dropdown{display:none;position:absolute;top:38px;right:0;background:#1a1a1a;border:1px solid var(--border);border-radius:14px;padding:8px;min-width:190px;z-index:100;animation:up .2s ease;}
+.dropdown.open{display:block;}
+.dd-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;font-size:13px;color:var(--mid);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.dd-item:hover{background:var(--dim);color:var(--white);}
+.dd-item.danger:hover{background:rgba(255,60,60,.1);color:#ff5555;}
+.dd-sep{height:1px;background:var(--border);margin:6px 0;}
+
+/* SHEETS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:flex-end;justify-content:center;padding:16px;}
+.overlay.open{display:flex;}
+.sheet{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px 22px;width:100%;max-width:480px;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);max-height:90vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.sheet-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:17px;margin-bottom:6px;}
+.sheet-sub{font-size:12px;color:var(--mid);margin-bottom:22px;line-height:1.6;}
+.sheet-btns{display:flex;flex-direction:column;gap:10px;margin-top:20px;}
+.sbtn{width:100%;padding:15px;border-radius:12px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;transition:all .2s;}
+.sbtn-save{background:var(--white);color:var(--bg);}
+.sbtn-save:hover{background:var(--off);}
+.sbtn-ghost{background:var(--dim);color:var(--mid);}
+.sbtn-ghost:hover{color:var(--white);}
+.sbtn-danger{background:transparent;border:1px solid #ff5555;color:#ff5555;}
+.sbtn-danger:hover{background:rgba(255,85,85,.1);}
+
+/* LOG SHEET */
+.log-item{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.log-item:last-child{border-bottom:none;}
+.log-num{font-family:'Unbounded',sans-serif;font-weight:900;font-size:20px;}
+.log-sub{font-size:11px;color:var(--mid);margin-top:1px;}
+.log-badge{padding:4px 12px;border-radius:999px;font-size:10px;border:1px solid var(--white);color:var(--white);}
+.log-empty{text-align:center;padding:24px;font-size:13px;color:var(--dim);}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--white);color:var(--bg);padding:12px 22px;border-radius:999px;font-size:13px;z-index:9999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="logo-eye">
+      <svg viewBox="0 0 100 60" fill="none">
+        <path d="M5 30 C20 5,80 5,95 30 C80 55,20 55,5 30Z" fill="#111" stroke="#fff" stroke-width="3"/>
+        <circle cx="50" cy="30" r="17" fill="#0a0a0a" stroke="#fff" stroke-width="1.5"/>
+        <circle cx="50" cy="30" r="9" fill="#000"/>
+        <circle cx="54" cy="26" r="3" fill="#fff" opacity=".9"/>
+      </svg>
+    </div>
+    OR'S HUB
+  </div>
+  <div class="nav-right">
+    <div class="nav-pill"><div class="dot"></div><span id="navTxt">Online</span></div>
+    <button class="nav-settings-btn" onclick="openGlobalSettings()" title="Configurações">⚙</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- STATS -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="slbl">Scripts</div>
+      <div class="sval" id="sScripts">0</div>
+      <div class="ssub">ativos</div>
+    </div>
+    <div class="stat-card">
+      <div class="slbl">Total Acessos</div>
+      <div class="sval" id="sHits">0</div>
+      <div class="ssub">execuções</div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="card" style="animation-delay:.05s">
+    <div class="slbl">Account</div>
+    <div class="acct-status">Active</div>
+    <div><span class="badge">⚙ Owner</span></div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="card" style="animation-delay:.1s">
+    <div class="upload-title">+ Novo Script</div>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".lua,.txt,.js" onchange="handleFile(this.files[0])"/>
+      <div class="drop-icon">☁</div>
+      <div class="drop-text"><strong>Solte o arquivo aqui</strong></div>
+      <div class="drop-hint">ou clique para selecionar (.lua, .txt, .js)</div>
+    </div>
+
+    <div id="fileChosen" style="display:none;font-size:12px;color:var(--mid);margin-bottom:12px;padding:10px 14px;background:var(--bg);border-radius:10px;border:1px solid var(--border);"></div>
+
+    <div class="divider">ou cole o código</div>
+
+    <div class="field">
+      <div class="field-lbl">Código Lua</div>
+      <textarea class="field-input field-textarea" id="pasteContent" placeholder="-- cole seu script aqui..."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="field-lbl">Nome do Script</div>
+      <input class="field-input" id="scriptName" type="text" placeholder="ex: OR's Duel Hub"/>
+    </div>
+
+    <button class="upload-btn" id="uploadBtn" onclick="uploadScript()">
+      ↑ &nbsp;FAZER UPLOAD
+    </button>
+  </div>
+
+  <!-- SCRIPTS LIST -->
+  <div class="card" style="animation-delay:.15s">
+    <div class="list-header">
+      <div class="list-title">Meus Scripts</div>
+      <div class="list-count" id="listCount">0 scripts</div>
+    </div>
+    <div id="scriptsList"><div class="empty-list">Nenhum script ainda</div></div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- LOG SHEET -->
+<div class="overlay" id="logOverlay" onclick="if(event.target===this)closeLog()">
+  <div class="sheet">
+    <div class="sheet-title">Log de Acessos</div>
+    <div class="sheet-sub" id="logSheetSub">Histórico de execuções</div>
+    <div id="logSheetBody"></div>
+    <div class="sheet-btns">
+      <button class="sbtn sbtn-ghost" onclick="clearLog()">↺ Limpar Log</button>
+      <button class="sbtn sbtn-ghost" onclick="closeLog()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE SHEET -->
+<div class="overlay" id="deleteOverlay" onclick="if(event.target===this)closeDelete()">
+  <div class="sheet">
+    <div class="sheet-title">Deletar Script</div>
+    <div class="sheet-sub">Isso remove o arquivo permanentemente. O loadstring vai parar de funcionar para todo mundo.<br><br><strong style="color:#fff">Não pode ser desfeito.</strong></div>
+    <div class="sheet-btns">
+      <button class="sbtn sbtn-danger" onclick="confirmDelete()">Deletar permanentemente</button>
+      <button class="sbtn sbtn-ghost" onclick="closeDelete()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL SETTINGS SHEET -->
+<div class="overlay" id="settingsOverlay" onclick="if(event.target===this)closeGlobalSettings()">
+  <div class="sheet">
+    <div class="sheet-title">Configurações</div>
+    <div class="sheet-sub">Webhook do Discord e senha do painel.</div>
+
+    <div class="field">
+      <div class="field-lbl">Webhook URL (Discord)</div>
+      <input class="field-input" id="cfgWebhook" type="text" placeholder="https://discord.com/api/webhooks/..."/>
+    </div>
+    <div class="field">
+      <div class="field-lbl">Senha do Painel (deixe vazio = sem senha)</div>
+      <input class="field-input" id="cfgPassword" type="password" placeholder="nova senha..."/>
+    </div>
+
+    <div class="sheet-btns">
+      <button class="sbtn sbtn-save" onclick="saveGlobalSettings()">Salvar</button>
+      <button class="sbtn sbtn-save" onclick="testWebhook()" style="background:var(--dim);color:var(--white)">🔔 Testar Webhook</button>
+      <button class="sbtn sbtn-ghost" onclick="closeGlobalSettings()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+// Troca pela URL do teu servidor Railway depois de hospedar
+const API = window.location.origin;
+
+let adminPass = localStorage.getItem("adminPass") || "";
+let currentScriptId = null;
+let selectedFile = null;
+
+// ─── INIT ─────────────────────────────────────────────────
+loadScripts();
+
+async function apiFetch(path, opts={}) {
+  if (!opts.headers) opts.headers = {};
+  if (adminPass) opts.headers["x-admin-password"] = adminPass;
+  const r = await fetch(API + path, opts);
+  if (r.status === 401) {
+    const pass = prompt("Digite a senha do painel:");
+    if (pass) { adminPass = pass; localStorage.setItem("adminPass", pass); return apiFetch(path, opts); }
+    throw new Error("Sem acesso");
+  }
+  return r.json();
+}
+
+async function loadScripts() {
+  try {
+    const scripts = await apiFetch("/api/admin/scripts");
+    renderScripts(scripts);
+    const totalHits = scripts.reduce((a,s) => a + (s.hits||0), 0);
+    document.getElementById("sScripts").textContent = scripts.length;
+    document.getElementById("sHits").textContent    = totalHits;
+    document.getElementById("listCount").textContent = scripts.length + " script" + (scripts.length!==1?"s":"");
+  } catch(e) { showToast("Erro ao carregar scripts"); }
+}
+
+function renderScripts(scripts) {
+  const el = document.getElementById("scriptsList");
+  if (!scripts.length) { el.innerHTML = `<div class="empty-list">Nenhum script ainda</div>`; return; }
+
+  el.innerHTML = scripts.map(s => {
+    const ls = `loadstring(game:HttpGet("${API}/s/${s.id}", true))()`;
+    return `
+    <div class="script-item" id="item-${s.id}">
+      <div class="si-top">
+        <div class="si-left">
+          <div class="si-icon">&lt;/&gt;</div>
+          <div>
+            <div class="si-name">${s.name}</div>
+            <div class="si-date">${s.created}</div>
+          </div>
+        </div>
+        <div class="menu-wrap">
+          <button class="three-dot" onclick="toggleMenu('menu-${s.id}')">⋯</button>
+          <div class="dropdown" id="menu-${s.id}">
+            <div class="dd-item" onclick="openLog('${s.id}','${s.name}')"><span>📋</span> Ver Log</div>
+            <div class="dd-sep"></div>
+            <div class="dd-item danger" onclick="openDelete('${s.id}')"><span>✕</span> Deletar</div>
+          </div>
+        </div>
+      </div>
+      <div class="si-badges">
+        <span class="si-badge si-badge-prot">🔒 Protected</span>
+        <span class="si-badge si-badge-hits">↓ ${s.hits||0} hits</span>
+      </div>
+      <div class="ls-mini" id="ls-${s.id}">${ls}</div>
+      <div class="si-btns">
+        <button class="si-btn primary" onclick="copyLS('${s.id}')">⎘ Copiar</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ─── UPLOAD ───────────────────────────────────────────────
+function handleFile(file) {
+  if (!file) return;
+  selectedFile = file;
+  const el = document.getElementById("fileChosen");
+  el.style.display = "block";
+  el.textContent = "📄 " + file.name;
+  if (!document.getElementById("scriptName").value)
+    document.getElementById("scriptName").value = file.name.replace(/\.(lua|txt|js)$/i, "");
+}
+
+// drag and drop
+const dz = document.getElementById("dropZone");
+dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
+dz.addEventListener("drop", e => { e.preventDefault(); dz.classList.remove("drag"); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+async function uploadScript() {
+  const name    = document.getElementById("scriptName").value.trim();
+  const content = document.getElementById("pasteContent").value.trim();
+  if (!name) { showToast("Digite um nome"); return; }
+  if (!selectedFile && !content) { showToast("Selecione um arquivo ou cole o código"); return; }
+
+  const btn = document.getElementById("uploadBtn");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spin"></div> &nbsp;ENVIANDO...`;
+
+  try {
+    let data;
+    if (selectedFile) {
+      const fd = new FormData();
+      fd.append("file", selectedFile);
+      fd.append("name", name);
+      const headers = {};
+      if (adminPass) headers["x-admin-password"] = adminPass;
+      const r = await fetch(API + "/api/admin/upload", { method:"POST", headers, body:fd });
+      data = await r.json();
+    } else {
+      data = await apiFetch("/api/admin/upload", {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ name, content })
+      });
+    }
+
+    if (data.ok) {
+      showToast("Script enviado!");
+      document.getElementById("scriptName").value = "";
+      document.getElementById("pasteContent").value = "";
+      document.getElementById("fileChosen").style.display = "none";
+      selectedFile = null;
+      loadScripts();
+    } else { showToast("Erro: " + (data.error||"desconhecido")); }
+  } catch(e) { showToast("Erro ao enviar"); }
+
+  btn.disabled = false;
+  btn.innerHTML = "↑ &nbsp;FAZER UPLOAD";
+}
+
+// ─── COPY ─────────────────────────────────────────────────
+function copyLS(id) {
+  const text = document.getElementById("ls-"+id)?.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => showToast("Loadstring copiado!"));
+}
+
+// ─── 3-DOT MENU ───────────────────────────────────────────
+function toggleMenu(id) {
+  document.querySelectorAll(".dropdown.open").forEach(d => { if(d.id !== id) d.classList.remove("open"); });
+  document.getElementById(id)?.classList.toggle("open");
+}
+document.addEventListener("click", e => {
+  if (!e.target.closest(".menu-wrap")) document.querySelectorAll(".dropdown.open").forEach(d => d.classList.remove("open"));
+});
+
+// ─── LOG ──────────────────────────────────────────────────
+async function openLog(id, name) {
+  currentScriptId = id;
+  document.getElementById("logSheetSub").textContent = name + " — histórico";
+  try {
+    const scripts = await apiFetch("/api/admin/scripts");
+    const s = scripts.find(x => x.id === id);
+    const log = s?.log || [];
+    const body = document.getElementById("logSheetBody");
+    if (!log.length) { body.innerHTML = `<div class="log-empty">Nenhum acesso registrado</div>`; }
+    else body.innerHTML = log.map(l => `
+      <div class="log-item">
+        <div><div class="log-num">#${l.n}</div><div class="log-sub">${l.time}</div></div>
+        <span class="log-badge">Executado</span>
+      </div>`).join("");
+  } catch(e) { showToast("Erro ao carregar log"); }
+  document.getElementById("logOverlay").classList.add("open");
+}
+function closeLog() { document.getElementById("logOverlay").classList.remove("open"); }
+async function clearLog() {
+  if (!currentScriptId) return;
+  await apiFetch(`/api/admin/scripts/${currentScriptId}/log`, { method:"DELETE" });
+  showToast("Log limpo"); closeLog(); loadScripts();
+}
+
+// ─── DELETE ───────────────────────────────────────────────
+function openDelete(id) { currentScriptId = id; document.getElementById("deleteOverlay").classList.add("open"); }
+function closeDelete() { document.getElementById("deleteOverlay").classList.remove("open"); }
+async function confirmDelete() {
+  if (!currentScriptId) return;
+  await apiFetch(`/api/admin/scripts/${currentScriptId}`, { method:"DELETE" });
+  showToast("Script deletado"); closeDelete(); loadScripts();
+}
+
+// ─── GLOBAL SETTINGS ──────────────────────────────────────
+async function openGlobalSettings() {
+  try {
+    const cfg = await apiFetch("/api/admin/settings");
+    document.getElementById("cfgWebhook").value  = cfg.webhookUrl || "";
+    document.getElementById("cfgPassword").value = "";
+  } catch(e) {}
+  document.getElementById("settingsOverlay").classList.add("open");
+}
+function closeGlobalSettings() { document.getElementById("settingsOverlay").classList.remove("open"); }
+async function saveGlobalSettings() {
+  const webhookUrl    = document.getElementById("cfgWebhook").value.trim();
+  const adminPassword = document.getElementById("cfgPassword").value;
+  await apiFetch("/api/admin/settings", {
+    method: "POST",
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify({ webhookUrl, adminPassword: adminPassword || undefined })
+  });
+  if (adminPassword) { adminPass = adminPassword; localStorage.setItem("adminPass", adminPassword); }
+  showToast("Configurações salvas"); closeGlobalSettings();
+}
+async function testWebhook() {
+  const url = document.getElementById("cfgWebhook").value.trim();
+  const r = await apiFetch("/api/admin/test-webhook", {
+    method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ url })
+  });
+  showToast(r.ok ? "Webhook enviado!" : "Erro: " + r.error);
+}
+
+// ─── TOAST ────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), 2300);
+}
+</script>
+</body>
+</html>
